@@ -1,0 +1,226 @@
+#!/usr/bin/env python
+# Script to backup sqlite3 database to a predefined folder.
+#
+#
+# Created by Andrew Northall <andrew@northall.me.uk>
+# https://github.com/anorthall/
+# This script is released in the public domain.
+#
+#
+
+
+# Please configure the following options:
+
+# DB file to backup
+db_file = "/home/andrew/www/northall.me.uk/northall/db.sqlite3"
+
+# Name to prefix to backup files
+# The backup file will be '{DB_NAME}-{TIMESTR}.sqlite3'
+db_name = "northall.me.uk"
+
+# Time string to use, from Python strftime()
+time_str = "%Y-%m-%d-%H%M%S"
+
+# Directory backups will be created in
+backup_dir = "/home/andrew/www/backups/northall.me.uk"
+
+# Logfile for the script (will report on successful backup or on error)
+# Set this to False to not log backups
+logfile = "/home/andrew/www/backups/northall.me.uk/backup.log"
+
+# Time string to use for the logfile, from Python strftime()
+logfile_time_str = "%Y-%M-%d %H:%M:%S"
+
+# Set silent = True to prevent printing any output to console
+silent = True
+
+# Log level
+# 3 = Debug
+# 2 = Info
+# 1 = Warn
+# 0 = Critical
+log_level = 2
+
+
+# ------------------------------
+#                              |
+# End of configuration options |
+#                              |
+# ------------------------------
+
+from datetime import datetime
+import os
+import argparse
+import sqlite3
+
+# Log levels
+DEBUG = (3, "DEBUG")
+INFO = (2, "INFO")
+WARN = (1, "WARN")
+CRIT = (0, "CRITICAL")
+
+#
+# Utility functions
+#
+
+
+def write_to_log(level, log_text):
+    # Do not attempt to log if LOGFILE == False
+    if logfile == False:
+        return
+
+    # Only log the appropriate level
+    level_int, level = level
+    if level_int > log_level:
+        return
+
+    # Create the logfile if it does not exist. We already checked that
+    # the directory exists, just above.
+    if os.path.exists(logfile) == False:
+        with open(logfile, "w"):
+            pass
+
+    time_str = datetime.now().strftime(logfile_time_str)
+
+    with open(logfile, "a") as log:
+        log.write(f"{time_str} {level} --- {log_text}\n")
+
+
+def console_print(text):
+    # Only print text if silent == False
+    if silent:
+        return
+    print(text)
+
+
+#
+# Argument parser
+#
+
+parser = argparse.ArgumentParser(description="Utility to backup sqlite3 database files")
+parser.add_argument(
+    "--silent",
+    help="do not print anything to the console, useful if running via cron",
+    action="store_true",
+)
+parser.add_argument("--no-log", help="do not write to logfile", action="store_true")
+args = parser.parse_args()
+
+
+if args.no_log:
+    logfile = False
+    write_to_log(DEBUG, "--no-log selected.")
+
+# Put this here otherwise when log_level is set to debug, it will log things
+# before --no-log is parsed.
+write_to_log(DEBUG, "Config loaded, parsing command line arguments...")
+
+if args.silent:
+    silent = True
+    write_to_log(DEBUG, "--silent selected")
+
+write_to_log(DEBUG, "Commandline arguments loaded.")
+write_to_log(DEBUG, "Starting initialisation...")
+
+
+#
+# Initial sanity checks - are the paths set in the config sensible/do they exist?
+#
+
+
+# Check if the logfile directory exists if logging is enabled
+if logfile != False:
+    backup_log_path = os.path.dirname(logfile)
+
+    if os.path.exists(backup_log_path) != True:
+        console_print(
+            "Error: The utility is configured to log and we could not "
+            "find the log file directory '{}'.".format(backup_log_path)
+        )
+        console_print(
+            "Please set 'logfile = False' in the script configuration, or "
+            "run with --no-log, or create the directory."
+        )
+        console_print("Exiting...")
+        exit(1)
+
+# Check if the DB file exists
+if os.path.exists(db_file) != True:
+    write_to_log(
+        CRIT,
+        "Error: The database file '{}' could not be found. No backup has "
+        "been attempted.".format(db_file),
+    )
+
+    console_print(
+        "Error: The database file '{}' could not be found. Exiting.".format(db_file)
+    )
+
+    console_print(
+        "Please change the value of 'db_file' " "in the script configuration."
+    )
+    console_print("Exiting...")
+    exit(1)
+
+# Check if the backup directory exists
+if os.path.exists(backup_dir) != True:
+    write_to_log(
+        CRIT,
+        "Error: The backup directory '{}' could not be found. No backup has "
+        "been attempted.".format(backup_dir),
+    )
+
+    console_print(
+        "Error: The backup directory '{}' " "could not be found.".format(backup_dir)
+    )
+    console_print(
+        "Please create the directory or change the value of 'backup_dir' "
+        "in the script configuration."
+    )
+    console_print("Exiting...")
+    exit(1)
+
+write_to_log(DEBUG, "Initialisation completed.")
+
+
+#
+# All sanity checks completed, we can now start the backup process
+#
+
+
+# Generate the backup filename
+backup_time = datetime.now().strftime(time_str)
+backup_file = os.path.join(f"{backup_dir}/", f"{db_name}-{backup_time}.sqlite3")
+write_to_log(DEBUG, f"Selected backup filename: {backup_file}.")
+
+# Check the backup file doesn't already exist
+if os.path.exists(backup_file):
+    write_to_log(
+        CRIT,
+        f"Error: Selected backup file {backup_file} already exists. Exiting without backup.",
+    )
+    console_print(
+        f"Error: Selected backup file {backup_file} already exists. Exiting without backup."
+    )
+    exit(1)
+
+
+# Connect to both databases
+write_to_log(DEBUG, f"Attempting to connect to both databases...")
+database = sqlite3.connect(db_file)
+write_to_log(DEBUG, f"Connected to original database {db_file}.")
+backup_db = sqlite3.connect(backup_file)
+write_to_log(DEBUG, f"Connected to backup database {backup_file}.")
+
+# Complete the backup
+write_to_log(DEBUG, f"Attempting to backup {db_file} to {backup_file}...")
+with backup_db:
+    database.backup(backup_db)
+
+write_to_log(DEBUG, f"Backup completed, closing both databases.")
+database.close()
+backup_db.close()
+write_to_log(DEBUG, "Both databases closed.")
+
+write_to_log(INFO, f"Backed up {db_file} to {backup_file}.")
+exit(0)
