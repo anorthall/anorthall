@@ -1,16 +1,17 @@
-### Hi there 👋
+### Hello! 
+I'm Andrew. I'm an amateur programmer, seeking to improve my skills through project based learning.  
 
-<!--
-**anorthall/anorthall** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
+Currently I am spending most of my time working on my Django based website 
+[[gh repo](https://github.com/anorthall/northall.me.uk)|[http](https://northall.me.uk)]. 
+I'd like to start getting involved with some open source projects, although I am struggling a
+little bit with where to start! If you have any ideas then please let me know.
 
-Here are some ideas to get you started:
+I'm currently working on:
 
-- 🔭 I’m currently working on ...
-- 🌱 I’m currently learning ...
-- 👯 I’m looking to collaborate on ...
-- 🤔 I’m looking for help with ...
-- 💬 Ask me about ...
-- 📫 How to reach me: ...
-- 😄 Pronouns: ...
-- ⚡ Fun fact: ...
--->
+- [My website](https://github.com/anorthall/northall.me.uk)
+- [A snake game with curses](https://github.com/anorthall/pysnake)
+- Making my way through the [Rust Book](https://doc.rust-lang.org/book/)
+
+#### Personal Repo
+I will store some basic one file scripts and perhaps TODO lists/project ideas in this repo. None of them are really
+intended for use by anyone else, but please feel free to look/comment.
