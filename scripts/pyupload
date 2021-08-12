@@ -25,12 +25,9 @@
 # If set to None, it will attempt to use default keyfiles.
 key = "/home/andrew/.ssh/anorthall"
 
-# web_root is a list of strings containing the web root of the server
-# you are uploading files to. If more than one string is specified then
-# it will give multiple URLs for each file uploaded.
-web = [
-    "https://files.ilk.im/",
-]
+# web_root is a string containing the web root of the server
+# you are uploading files to. 
+web = "https://files.ilk.im/"
 
 # server is the server to connect to via scp
 server = "northall.me.uk"
