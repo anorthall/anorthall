@@ -82,7 +82,4 @@ parser.add_argument(
 
 args = parser.parse_args()
 
-for k, v in args.__dict__.items():
-    # I already defined variables with the name of `k` in a config file
-    # but if they were passed to argparser I want to overwrite those variables
-
+print(args)
