@@ -7,7 +7,6 @@ Currently I am spending most of my time working on my Django based website
 I'm currently working on:
 
 - [My website](https://github.com/anorthall/northall.me.uk)
-- [A snake game with curses](https://github.com/anorthall/pysnake)
 - Making my way through the [Rust Book](https://doc.rust-lang.org/book/)
 
 #### Personal Repo
