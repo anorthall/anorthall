@@ -6,7 +6,7 @@ Currently I am spending most of my time working on my [Django based website](htt
 I'm currently working on:
 
 - Making my way through the [Rust Book](https://doc.rust-lang.org/book/)
-- Some minor with the [EMFCamp webiste](https://github.com/emfcamp/website)
+- Some minor bits on the [EMFCamp webiste](https://github.com/emfcamp/website)
 - Tinkering with my home server
 
 #### Personal Repo
